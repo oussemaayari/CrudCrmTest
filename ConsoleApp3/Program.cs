@@ -10,81 +10,86 @@ using Microsoft.Xrm.Tooling.Connector;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
-
+using System.Net.Http;
+using System.Net;
+using System.Configuration;
+using System.Web.Configuration;
+using Microsoft.Xrm.Sdk.Client;
+using System.ServiceModel.Description;
 
 namespace ConsoleApp3
 {
     class Program
     {
+        IOrganizationService _service;
+
+        IOrganizationService _service2;
+
         static void Main(string[] args)
+        {
+            IOrganizationService _service2;
+            var instance = new Program();
+
+            //  _service2 =   instance.GetOrganizationServicess();
+
+            //    if (_service2 == null)
+            //{
+            //    Console.WriteLine(_service2.ToString());
+            //}
+            //else
+            //{
+            //    Console.WriteLine("CRM CONNECTED");
+            //}
+            Console.WriteLine(instance.GetOrganizationServicess());
+
+            Console.ReadLine();
+
+
+
+        }
+
+
+      string GetOrganizationServicess()
         {
             try
             {
-                var connectionString = @"AuthType = Office365; 
-                            Url =https://orgcacc7db5.crm4.dynamics.com;
-                            Username=ayari@isamm.u-manouba.tn;
-                            Password=XgtS?%RTNj";
-                CrmServiceClient conn = new CrmServiceClient(connectionString);
-
-                IOrganizationService service;
-                service = (IOrganizationService)conn.
-                    OrganizationWebProxyClient != null ? (IOrganizationService)conn.OrganizationWebProxyClient : (IOrganizationService)conn.OrganizationServiceProxy;
-
-                // Create a new record
-               /* Entity contact = new Entity("contact");
-                contact["firstname"] = "Bob";
-                contact["lastname"] = "Smith";
-                Guid contactId = service.Create(contact);
-                Console.WriteLine("New contact id: {0}.", contactId.ToString());*/
-                //create another reecord 
-                Entity oussema = new Entity("contact");
-                oussema["firstname"] = "oussema";
-                oussema["lastname"] = "ayari";
-                oussema["emailaddress1"] = "oussema.ayari@gmail.com";
-                oussema["company"] = "HLI";
-                oussema["telephone1"] = "24075932";
-
-                Guid oussemaID = service.Create(oussema);
-                Console.WriteLine("new contact id : {0} ", oussemaID.ToString());
-
-                // Retrieve a record using Id
-
-               /* Entity retrievedContact = service.Retrieve(contact.LogicalName, contactId, new ColumnSet(true));
-                Console.WriteLine("Record retrieved {0}", retrievedContact.Id.ToString());*/
-
-                // Update record using Id, retrieve all attributes
-
-                Entity updatedContact = new Entity("contact");
-                updatedContact = service.Retrieve(oussema.LogicalName, oussemaID, new ColumnSet("lastname"));
-                updatedContact["firstname"] = "saif";
-                updatedContact["emailaddress1"] = "test@test.com";
-                service.Update(updatedContact);
-                Console.WriteLine("Updated contact");
-
-                // Retrieve specific fields using ColumnSet
-                Entity retrievedContact = service.Retrieve(oussema.LogicalName, oussemaID, new ColumnSet(true));
-                ColumnSet attributes = new ColumnSet(new string[] { "firstname", "emailaddress1" });
-                retrievedContact = service.Retrieve(oussema.LogicalName, oussemaID, attributes);
-                foreach (var a in retrievedContact.Attributes)
-                {
-                    Console.WriteLine("Retrieved contact field {0} - {1}", a.Key, a.Value);
-                }
+                
+                    //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+                    //string IpCrm = WebConfigurationManager.AppSettings["IpCrm"];
+                    //string organizationserviceendpoint = WebConfigurationManager.AppSettings["OrganizationUri"];
+                    //string crmusername = WebConfigurationManager.AppSettings["username"];
+                    //string crmpassword = WebConfigurationManager.AppSettings["password"];
 
 
-                // Delete a record using Id
 
-                /*  service.Delete(contact.LogicalName, contactId);
-                  Console.WriteLine("Deleted");
-                  Console.ReadLine();*/
-                Console.ReadLine();
+                    ClientCredentials credentials = new ClientCredentials();
+                    credentials.UserName.UserName = "o.ayarii";
+                    credentials.UserName.Password = "Azerty@123+";
+                 Uri serviceUri = new Uri( "https://xrm-stagiaire.crm-hlitn.com/crmstagiere");
+                // OrganizationServiceProxy proxy = new OrganizationServiceProxy(serviceUri, null, credentials, null);
 
+                //  proxy.EnableProxyTypes();
+
+
+
+
+
+
+
+                //  _service = (IOrganizationService)proxy;
+                return "connected";
+
+
+
+               
+              
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.ReadLine();
+                return "non bb";
             }
-
         }
+
+
     }
 }
