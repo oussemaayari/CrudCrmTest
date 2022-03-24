@@ -502,3 +502,91 @@ namespace ConsoleApp3
 //    Console.WriteLine(ex.Message);
 //    Console.ReadLine();
 //}
+
+
+/*******************************************************************************************************************************/
+/******************************************************************************************************************************/
+/*********************************************************************************************************************************/
+
+
+//if (proxy.IsAuthenticated)
+//{
+
+//}
+//else
+//{
+//    Console.WriteLine("CRM  Not CONNECTED");
+//}
+
+//var connectionString = @" AuthType = Office365;              
+//    Url = https://orgcde5f393.crm4.dynamics.com;
+//        Username=Saif.Hazemi@isamm.u-manouba.tn;
+//        Password=g'lmaram9782536A";
+//CrmServiceClient conn = new CrmServiceClient(connectionString);
+//IOrganizationService service;
+//service = (IOrganizationService)conn.
+//    OrganizationWebProxyClient != null ? (IOrganizationService)conn.OrganizationWebProxyClient : (IOrganizationService)conn.OrganizationServiceProxy;
+
+//if (conn != null && conn.IsReady)
+//{
+//    Console.WriteLine("CRM CONNECTED");
+
+//}
+//else
+//{
+//    Console.WriteLine("CRM NOT CONNECTED");
+//}
+////create the query expression object
+//QueryExpression query = new QueryExpression();
+
+////Query on reated entity records
+//query.EntityName = "Contact";
+
+////Retrieve the all attributes of the related record
+//query.ColumnSet = new ColumnSet(true);
+
+////create the relationship object
+//Relationship relationship = new Relationship();
+
+////add the condition where you can retrieve only the account related active contacts
+//query.Criteria = new FilterExpression();
+//query.Criteria.AddCondition(new ConditionExpression("statecode", ConditionOperator.Equal, "Active"));
+
+//// name of relationship between account & contact
+//relationship.SchemaName = "Contact_customer_accounts";
+
+////create relationshipQueryCollection Object
+//RelationshipQueryCollection relatedEntity = new RelationshipQueryCollection();
+
+////Add the your relation and query to the RelationshipQueryCollection
+//relatedEntity.Add(relationship, query);
+
+////create the retrieve request object
+//RetrieveRequest request = new RetrieveRequest();
+
+////add the relatedentities query
+//request.RelatedEntitiesQuery = relatedEntity;
+
+////set column to  and the condition for the account 
+//request.ColumnSet = new ColumnSet("accountid");
+//var id = Guid.Parse("dbdd0b93-4a1b-4848-b83a-39352f6b2e7a");
+//request.Target = new EntityReference { Id = id, LogicalName = "account" };
+
+////execute the request
+//RetrieveResponse response = (RetrieveResponse)service.Execute(request);
+//for(int i = 0; i< ((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("Contact_customer_accounts")].Entities.Count; i++)
+//{
+//    Console.WriteLine(((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("Contact_customer_accounts")].Entities[i].Attributes["Contactid"]);
+//    Console.WriteLine(((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("Contact_customer_accounts")].Entities[i].Attributes["title"]);
+//}
+//Console.WriteLine(((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("Contact_customer_accounts")].Entities.Count);
+//// here you can check collection count
+////if (((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities)))).Contains(new Relationship("contact_customer_accounts")) && ((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("contact_customer_accounts")].Entities.Count > 0)
+////{ Console.WriteLine();}
+////else
+////   
+
+//Program instance = new Program();
+
+
+//Console.WriteLine(instance.GetOrganizationServicess());

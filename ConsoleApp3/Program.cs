@@ -17,139 +17,165 @@ using System.Web.Configuration;
 using Microsoft.Xrm.Sdk.Client;
 using System.ServiceModel.Description;
 using Microsoft.Xrm.Sdk.Messages;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace ConsoleApp3
 {
     class Program
     {
+        private Guid _userId;
+        private String _givenRole = "salesperson";
 
+        // IOrganizationService _service;
 
-        IOrganizationService _service2;
 
         static void Main(string[] args)
         {
+           IOrganizationService _service;
+            List<Contact> contacts = new List<Contact>();
+  
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11|SecurityProtocolType.Ssl3;        
 
-                //IOrganizationService _service;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
-                //string IpCrm = WebConfigurationManager.AppSettings["IpCrm"];
-                //string organizationserviceendpoint = WebConfigurationManager.AppSettings["OrganizationUri"];
-                //string crmusername = WebConfigurationManager.AppSettings["username"];
-                //string crmpassword = WebConfigurationManager.AppSettings["password"];
-
-
-
-                //ClientCredentials credentials = new ClientCredentials();
-                //credentials.UserName.UserName = "o.ayarii";
-                //credentials.UserName.Password = "Azerty@123+";
-                //Uri serviceUri = new Uri("https://xrm-stagiaire.crm-hlitn.com/crmstagiere/XRMServices/2011/Organization.svc");
-                //OrganizationServiceProxy proxy = new OrganizationServiceProxy(serviceUri, null, credentials, null);
-
-                //proxy.EnableProxyTypes();
-                //_service = (IOrganizationService)proxy;
-
-
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
-            //string IpCrm = WebConfigurationManager.AppSettings["IpCrm"];
-            //string organizationserviceendpoint = WebConfigurationManager.AppSettings["OrganizationUri"];
-            //string crmusername = WebConfigurationManager.AppSettings["username"];
-            //string crmpassword = WebConfigurationManager.AppSettings["password"];
-
+            Console.WriteLine("waiting ...");
+            
+            ServicePointManager.ServerCertificateValidationCallback =
+       delegate (
+           object s,
+           X509Certificate certificate,
+           X509Chain chain,
+           SslPolicyErrors sslPolicyErrors
+       ) {
+         
+           return true;
+       };
             ClientCredentials credentials = new ClientCredentials();
-            credentials.UserName.UserName = "se.hazemi";
+            credentials.UserName.UserName = "o.ayarii";
             credentials.UserName.Password = "Azerty@123+";
             Uri serviceUri = new Uri("https://xrm-stagiaire.crm-hlitn.com/crmstagiere/XRMServices/2011/Organization.svc");
             OrganizationServiceProxy proxy = new OrganizationServiceProxy(serviceUri, null, credentials, null);
             proxy.EnableProxyTypes();
-            var _service = (IOrganizationService)proxy;
-            var t = _service.RetrieveMultiple(new QueryExpression() { EntityName = "contact" });
+            _service = (IOrganizationService)proxy;
+            // var t = _service.RetrieveMultiple(new QueryExpression() { EntityName = "contact" });
+            // 
+            var result = new List<Contact>();
+            EntityCollection resp;        
+
+
+            do
+            {
+                var query = new QueryExpression("contact") { ColumnSet = new ColumnSet("contactid", "fullname", "new_password", "emailaddress1", "new_contact_role") };
+                //resp = _service.RetrieveMultiple(query);
+                Guid targetedId = new Guid("82ba41b0-43a2-ec11-ac46-000c299f48b4");
+
+                var query2 = new QueryExpression("role") { ColumnSet = new ColumnSet("roleid", "businessunitid","name") };
+                resp = _service.RetrieveMultiple(query);
+
+                for (int i = 1; i < resp.Entities.Count; i++)
+                  {
+                      Contact contact = new Contact();
+                      if (resp.Entities[i].Contains("contactid"))
+                      {
+                          Console.WriteLine((string)resp.Entities[i].Attributes["contactid"].ToString());
+
+
+
+                      } 
+                    if (resp.Entities[i].Contains("fullname"))
+                      {
+                          Console.WriteLine((string)resp.Entities[i].Attributes["fullname"]);
+
+
+                      }
+                    if (resp.Entities[i].Contains("new_contact_role"))
+                      {
+                        
+                      var test= resp.Entities[i].GetAttributeValue<EntityReference>("new_contact_role");
+                          Console.WriteLine(test.Name);
+
+                      }
+             /*       QueryExpression query3 = new QueryExpression
+                    {
+                        EntityName = "role",
+                        ColumnSet = new ColumnSet("roleid"),
+                        Criteria = new FilterExpression
+                        {
+                            Conditions =
+                                {
+
+                                    new ConditionExpression
+                                    {
+                                        AttributeName = "name",
+                                        Operator = ConditionOperator.Equal,
+                                        Values = { "salesperson" }
+                                    }
+                                }
+                        }
+                    };*/
+
+                  /*  EntityCollection roles = _service.RetrieveMultiple(query2);
+                    if (roles.Entities.Count > 0)
+                    {
+                        Entity Role = _service.RetrieveMultiple(query2).Entities[0];
+
+                        Console.WriteLine("Role {0} is retrieved for the role assignment.", Role.Attributes["roleid"]);
+
+                      Guid  _roleId = new Guid(Role.Attributes["roleid"].ToString());
+
+                        // Associate the user with the role.
+                        if (_roleId != Guid.Empty && targetedId != Guid.Empty)
+                        {
+                            _service.Associate(
+                                        "contact",
+                                        targetedId,
+                                        new Relationship("new_contact_role"),
+                                        new EntityReferenceCollection() { new EntityReference("role", _roleId) });
+
+                            Console.WriteLine("Role is associated with the user.");
+                        }
+                    }*/
+
+
+
+
+                    //if (resp.Entities[i].Contains("new_password"))
+                    //{
+                    //    contact.password = (string)resp.Entities[i].Attributes["new_password"];
+                    //}
+                    //if (resp.Entities[i].Contains("emailaddress1"))
+                    //{
+                    //    contact.emailadress1= (string)resp.Entities[i].Attributes["emailaddress1"];
+                    //}
+                    //if (resp.Entities[i].Contains("telephone1"))
+                    //{
+                    //    contact.telephone1 = (string)resp.Entities[i].Attributes["telephone1"];
+                    //}
+                    contacts.Add(contact);
+                  }
+
+            } while (resp.MoreRecords);
+
 
            
 
+    
+
+            // Find the role.
+          
 
 
-
-
-
-
-
-            //var connectionString = @" AuthType = Office365;              
-            //    Url = https://orgcde5f393.crm4.dynamics.com;
-            //        Username=Saif.Hazemi@isamm.u-manouba.tn;
-            //        Password=g'lmaram9782536A";
-            //CrmServiceClient conn = new CrmServiceClient(connectionString);
-            //IOrganizationService service;
-            //service = (IOrganizationService)conn.
-            //    OrganizationWebProxyClient != null ? (IOrganizationService)conn.OrganizationWebProxyClient : (IOrganizationService)conn.OrganizationServiceProxy;
-
-            //if (conn != null && conn.IsReady)
-            //{
-            //    Console.WriteLine("CRM CONNECTED");
-
-            //}
-            //else
-            //{
-            //    Console.WriteLine("CRM NOT CONNECTED");
-            //}
-            ////create the query expression object
-            //QueryExpression query = new QueryExpression();
-
-            ////Query on reated entity records
-            //query.EntityName = "incident";
-
-            ////Retrieve the all attributes of the related record
-            //query.ColumnSet = new ColumnSet(true);
-
-            ////create the relationship object
-            //Relationship relationship = new Relationship();
-
-            ////add the condition where you can retrieve only the account related active contacts
-            //query.Criteria = new FilterExpression();
-            //query.Criteria.AddCondition(new ConditionExpression("statecode", ConditionOperator.Equal, "Active"));
-
-            //// name of relationship between account & contact
-            //relationship.SchemaName = "incident_customer_accounts";
-
-            ////create relationshipQueryCollection Object
-            //RelationshipQueryCollection relatedEntity = new RelationshipQueryCollection();
-
-            ////Add the your relation and query to the RelationshipQueryCollection
-            //relatedEntity.Add(relationship, query);
-
-            ////create the retrieve request object
-            //RetrieveRequest request = new RetrieveRequest();
-
-            ////add the relatedentities query
-            //request.RelatedEntitiesQuery = relatedEntity;
-
-            ////set column to  and the condition for the account 
-            //request.ColumnSet = new ColumnSet("accountid");
-            //var id = Guid.Parse("dbdd0b93-4a1b-4848-b83a-39352f6b2e7a");
-            //request.Target = new EntityReference { Id = id, LogicalName = "account" };
-
-            ////execute the request
-            //RetrieveResponse response = (RetrieveResponse)service.Execute(request);
-            //for(int i = 0; i< ((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("incident_customer_accounts")].Entities.Count; i++)
-            //{
-            //    Console.WriteLine(((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("incident_customer_accounts")].Entities[i].Attributes["incidentid"]);
-            //    Console.WriteLine(((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("incident_customer_accounts")].Entities[i].Attributes["title"]);
-            //}
-            //Console.WriteLine(((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("incident_customer_accounts")].Entities.Count);
-            //// here you can check collection count
-            ////if (((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities)))).Contains(new Relationship("contact_customer_accounts")) && ((DataCollection<Relationship, EntityCollection>)(((RelatedEntityCollection)(response.Entity.RelatedEntities))))[new Relationship("contact_customer_accounts")].Entities.Count > 0)
-            ////{ Console.WriteLine();}
-            ////else
-            ////   
-
-            //Program instance = new Program();
-
-
-            //Console.WriteLine(instance.GetOrganizationServicess());
             Console.ReadLine();
 
 
 
         }
 
+        private static string getRoleName()
+        {
+
+
+            return "";
+        }
 
         public IOrganizationService GetOrganizationService()
         {
